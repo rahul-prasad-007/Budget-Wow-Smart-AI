@@ -3,10 +3,9 @@ import {
   getCategoryIcon,
   getCategoryLabel,
 } from "../../utils/categories";
-import { formatCurrency } from "../../utils/expenses";
 import { Sparkles } from "lucide-react";
 
-const ReceiptConfirmForm = ({ data, onChange, onConfirm, onBack, isSubmitting }) => {
+const ReceiptConfirmForm = ({ data, onChange }) => {
   const categories = getAllCategories();
   const confidencePercent = Math.round((data.confidenceScore || 0) * 100);
 
@@ -73,31 +72,6 @@ const ReceiptConfirmForm = ({ data, onChange, onConfirm, onBack, isSubmitting })
             ))}
           </select>
         </div>
-      </div>
-
-      {data.amount > 0 && (
-        <p className="text-sm text-gray-600 text-center">
-          Total: <span className="font-semibold text-expense">{formatCurrency(Number(data.amount))}</span>
-        </p>
-      )}
-
-      <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isSubmitting}
-          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm disabled:opacity-50"
-        >
-          Scan Again
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={isSubmitting}
-          className="flex-1 px-4 py-2.5 bg-expense text-white rounded-lg hover:bg-expense-dark font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          {isSubmitting ? "Saving..." : "Confirm & Add Expense"}
-        </button>
       </div>
     </div>
   );

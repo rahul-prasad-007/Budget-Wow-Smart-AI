@@ -8,6 +8,7 @@ import { useReceiptScan, useReceiptStatus } from "../../hooks/useAI";
 import ReceiptUploadZone from "./ReceiptUploadZone";
 import ReceiptConfirmForm from "./ReceiptConfirmForm";
 import { ReceiptScanSkeleton } from "./AISkeleton";
+import { formatCurrency } from "../../utils/expenses";
 
 const STEPS = [
   { id: "upload", label: "Upload" },
@@ -128,7 +129,7 @@ const ReceiptScannerModal = ({ isOpen, onClose }) => {
       role="presentation"
     >
       <div
-        className="receipt-scanner-modal app-modal-panel app-modal-panel--enter w-full max-w-lg max-h-[min(90vh,720px)] overflow-y-auto"
+        className="receipt-scanner-modal app-modal-panel app-modal-panel--enter w-full max-w-lg"
         role="dialog"
         aria-modal="true"
         aria-labelledby="receipt-scanner-title"
@@ -213,12 +214,38 @@ const ReceiptScannerModal = ({ isOpen, onClose }) => {
             <ReceiptConfirmForm
               data={extracted}
               onChange={setExtracted}
-              onConfirm={handleConfirm}
-              onBack={handleScanAgain}
-              isSubmitting={isSaving}
             />
           )}
         </div>
+
+        {step === "confirm" && extracted && (
+          <div className="receipt-scanner-modal__footer">
+            {extracted.amount > 0 && (
+              <p className="receipt-scanner-modal__footer-total">
+                Total:{" "}
+                <span>{formatCurrency(Number(extracted.amount))}</span>
+              </p>
+            )}
+            <div className="receipt-scanner-modal__footer-actions">
+              <button
+                type="button"
+                onClick={handleScanAgain}
+                disabled={isSaving}
+                className="receipt-scanner-modal__btn receipt-scanner-modal__btn--secondary"
+              >
+                Scan Again
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirm}
+                disabled={isSaving}
+                className="receipt-scanner-modal__btn receipt-scanner-modal__btn--primary"
+              >
+                {isSaving ? "Saving..." : "Confirm & Add Expense"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body
