@@ -7,9 +7,10 @@ import {
   getGoogleRedirectUri,
   isGoogleConfigured,
 } from "../config/google.js";
+import { getClientUrl } from "../utils/url.js";
 
 const router = express.Router();
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const clientUrl = getClientUrl();
 
 const sendAuthResponse = (res, user, status = 200) => {
   const token = signToken(user._id);

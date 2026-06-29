@@ -1,4 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
+import { getApiUrl } from "../utils/url.js";
 
 const INVALID_PATTERNS = [
   "your_google_client_id",
@@ -22,8 +23,7 @@ export const isGoogleConfigured = () => {
 };
 
 export const getGoogleRedirectUri = () => {
-  const base = process.env.API_URL || `http://localhost:${process.env.PORT || 5000}`;
-  return `${base.replace(/\/$/, "")}/api/auth/google/callback`;
+  return `${getApiUrl()}/api/auth/google/callback`;
 };
 
 export const createGoogleOAuthClient = () =>

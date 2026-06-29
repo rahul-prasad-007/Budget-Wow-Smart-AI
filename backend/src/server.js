@@ -12,6 +12,7 @@ import feedbackRoutes from "./routes/feedbackRoutes.js";
 import receiptRoutes from "./routes/receiptRoutes.js";
 import insightsRoutes from "./routes/insightsRoutes.js";
 import { handleUploadError } from "./middleware/upload.js";
+import { getClientUrl, normalizeBaseUrl } from "./utils/url.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -19,9 +20,19 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedClientOrigin = getClientUrl();
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, allowedClientOrigin);
+      }
+      if (normalizeBaseUrl(origin) === allowedClientOrigin) {
+        return callback(null, origin);
+      }
+      callback(null, false);
+    },
     credentials: true,
   })
 );
