@@ -25,12 +25,10 @@ const BAR_COLORS = [
 const ExpenseBarChart = ({ data }) => {
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const chartData = Object.entries(data)
-    .map(([name, value]) => ({
-      name,
-      amount: value,
-    }))
-    .reverse();
+  const chartData = Object.entries(data).map(([name, value]) => ({
+    name,
+    amount: value,
+  }));
 
   if (chartData.length === 0) {
     return (

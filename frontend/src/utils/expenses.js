@@ -64,26 +64,50 @@ export const getMonthName = (date) => {
   return date.toLocaleString("default", { month: "long" });
 };
 
-export const getExpensesByMonth = (expenses, numMonths = 6) => {
-  const now = new Date();
-  const result = {};
+const parseExpenseDate = (dateString) => {
+  if (!dateString) return null;
+  const d = new Date(dateString);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
 
-  for (let i = 0; i < numMonths; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthYear = `${getMonthName(d)} ${d.getFullYear()}`;
-    result[monthYear] = 0;
-  }
+const monthYearSortKey = (monthYear) => {
+  const d = new Date(`${monthYear} 1`);
+  return Number.isNaN(d.getTime()) ? 0 : d.getTime();
+};
 
-  expenses.forEach((expense) => {
-    const expenseDate = new Date(expense.date);
-    const monthYear = `${getMonthName(
-      expenseDate
-    )} ${expenseDate.getFullYear()}`;
+/**
+ * Bar chart data: totals per month-year for every expense (not limited to recent months).
+ * When history spans many years, groups by year so 2015 / 2024 / 2026 all appear clearly.
+ */
+export const getExpensesByMonth = (expenses) => {
+  const dated = expenses
+    .map((expense) => ({ expense, date: parseExpenseDate(expense.date) }))
+    .filter((entry) => entry.date);
 
-    if (result[monthYear] !== undefined) {
-      result[monthYear] += expense.amount;
-    }
+  if (dated.length === 0) return {};
+
+  const timestamps = dated.map((entry) => entry.date.getTime());
+  const minDate = new Date(Math.min(...timestamps));
+  const maxDate = new Date(Math.max(...timestamps));
+  const monthSpan =
+    (maxDate.getFullYear() - minDate.getFullYear()) * 12 +
+    (maxDate.getMonth() - minDate.getMonth());
+  const useYearly =
+    maxDate.getFullYear() - minDate.getFullYear() >= 2 || monthSpan > 24;
+
+  const totals = {};
+
+  dated.forEach(({ expense, date }) => {
+    const key = useYearly
+      ? String(date.getFullYear())
+      : `${getMonthName(date)} ${date.getFullYear()}`;
+    totals[key] = (totals[key] || 0) + expense.amount;
   });
 
-  return result;
+  const sorted = Object.entries(totals).sort(([a], [b]) => {
+    if (useYearly) return Number(a) - Number(b);
+    return monthYearSortKey(a) - monthYearSortKey(b);
+  });
+
+  return Object.fromEntries(sorted);
 };
