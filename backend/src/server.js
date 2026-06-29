@@ -59,6 +59,21 @@ const startServer = async () => {
     await connectDB();
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on port ${PORT}`);
+      if (process.env.NODE_ENV === "production") {
+        if (!process.env.CLIENT_URL || process.env.CLIENT_URL.includes("localhost")) {
+          console.warn(
+            "CLIENT_URL should be your production frontend URL (e.g. https://your-app.netlify.app) for CORS and OAuth redirects."
+          );
+        }
+        if (!process.env.API_URL) {
+          console.warn(
+            "API_URL should be your Render service URL (e.g. https://budgetwow-api.onrender.com) for Google OAuth callbacks."
+          );
+        }
+        if (!process.env.JWT_SECRET) {
+          console.warn("JWT_SECRET is required in production.");
+        }
+      }
       if (!isGoogleConfigured()) {
         console.warn(
           "Google OAuth is NOT configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to backend/.env — see GOOGLE_AUTH_SETUP.md"

@@ -13,9 +13,8 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { authApi } from "../api/client";
+import { API_BASE } from "../api/config";
 import { useAuth } from "../context/AuthContext";
-
-const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
